@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My page</title>
+</head>
+<style type="text/css">
+
+    .box1 {
+        width: 600px;
+        height: 20px;
+        margin-left: 100px;
+        text-align: center;
+    }
+
+    .details {
+        position: absolute;
+        left: 618px;
+        top: 352px;
+    }
+
+
+</style>
+<body>
+<div style="margin-left: 280px;border-style: solid;width: 800px;height: 700px">
+    <h1 style="text-align: center">Buy T-shirts Online</h1>
+    <h2 style="text-align: center">Fill out the form below and click "Order Now" to order </h2>
+    <div>
+        
+
+            <label class="box1">Search by order number:</label> <input type="text">
+            <button type="submit">Search</button>
+
+            <br>
+            <form action="E15138Lab2_get.php" method ="get">
+            <label class="box1">Choose your size:</label>
+            <input style="margin-left: 60px" type="radio" name="size" value="small"> Small
+            <input type="radio" name="size" value="medium"> Medium
+            <input type="radio" name="size" value="large"> Large
+            <br>
+            <label class="box1">
+                Choose your colour:
+            </label>
+            <select style="margin-left: 46px" name="color">
+                <option value="red">Red</option>
+                <option value="blue">Blue</option>
+                <option value="green">Green</option>
+                <option value="orange">Orange</option>
+            </select>
+            <br>
+            <label style="position: absolute;top: 300px;left: 411px">Extra Items: </label>
+            <input style="margin-left: 310px;" type="checkbox" name="Cap" value="cap"> Cap <br>
+            <input style="margin-left: 310px" type="checkbox" name="Wrist Band" value="wristBand">Wrist Band<br>
+
+
+            <label style="height:600px;position: absolute;top:418px;left: 411px">Deliver To: </label>
+            <div class="details">
+                <label>First name:
+                    <input type="text" name="firstname" style="margin-left:4px">
+                </label><br>
+                <label>Last name:
+                    <input style="margin-left: 6px" type="text" name="lastname"></label><br>
+                <label>Address1:
+                    <input style="margin-left: 16px" type="text" name="address1"></label><br>
+                <label>Address2:
+                    <input style="margin-left: 16px" type="text" name="address2"></label><br>
+                <label>Address3:
+                    <input style="margin-left: 16px" type="text" name="address3"></label><br>
+            </div>
+            <br>
+            <label style="position:absolute;top: 580px;left: 411px">Your Comments: </label><br>
+            <textarea type="text" name="comments" rows="10" cols="40"
+                      style="position: absolute;top: 520px;left: 620px"></textarea><br>
+            <button style="position: absolute;top:680px;left:620px " type="submit">Order Now</button>
+
+
+        </form>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,47 @@
+CREATE TABLE `e15138`.`customers` ( `customerID` INT NOT NULL AUTO_INCREMENT ,
+ `firstname` VARCHAR(63) NOT NULL , 
+`lastname` VARCHAR(63) NOT NULL ,
+ `address1` VARCHAR(255) NOT NULL ,
+ `address2` VARCHAR(255) NOT NULL , 
+`address3` VARCHAR(255) NOT NULL ,
+ PRIMARY KEY (`customerID`));
+
+
+CREATE TABLE `e15138`.`tshirts` ( `tshirtID` INT NOT NULL AUTO_INCREMENT ,
+ `color` ENUM("red","blue","orange","green") NOT NULL ,
+ `size` ENUM("small","medium","large") NOT NULL , 
+`stock` INT(6) NOT NULL , PRIMARY KEY (`tshirtID`));
+
+
+CREATE TABLE `e15138`.`orders` ( `orderID` INT NOT NULL AUTO_INCREMENT ,
+ `customerID` INT(6) NOT NULL, `tshirtID` INT(6) NOT NULL, 
+`iscap` TINYINT , 
+`iswristband` TINYINT,
+ PRIMARY KEY (`orderID`),
+ CONSTRAINT customerID FOREIGN KEY (`customerID`) REFERENCES customers(`customerID`) ON DELETE CASCADE ON UPDATE CASCADE, 
+CONSTRAINT tshirtID FOREIGN KEY (`tshirtID`) REFERENCES tshirts(`tshirtID`) );
+
+
+INSERT INTO `tshirts` (`tshirtID`, `color`, `size`, `stock`) VALUES (NULL, 'red', 'small', '10');
+INSERT INTO `tshirts` (`tshirtID`, `color`, `size`, `stock`) VALUES (NULL, 'green', 'large', '10');
+INSERT INTO `tshirts` (`tshirtID`, `color`, `size`, `stock`) VALUES (NULL, 'blue', 'medium', '20');
+
+
+INSERT INTO `customers` (`customerID`, `firstname`, `lastname`, `address1`, `address2`, `address3`) VALUES (NULL, 'john', 'doe', '99/b colombo street', 'kandy', 'srilanka');
+INSERT INTO `customers` (`customerID`, `firstname`, `lastname`, `address1`, `address2`, `address3`) VALUES (NULL, 'testname1', 'testname2', ' street', 'chennai', 'india');
+
+INSERT INTO `orders` (`orderID`, `customerID`, `tshirtID`, `iscap`, `iswristband`) VALUES (NULL, '1', '1', '0', '0');
+INSERT INTO `orders` (`orderID`, `customerID`, `tshirtID`, `iscap`, `iswristband`) VALUES (NULL, '2', '2', '1', '0');
+INSERT INTO `orders` (`orderID`, `customerID`, `tshirtID`, `iscap`, `iswristband`) VALUES (NULL, '1', '1', '0', '1');
+
+UPDATE `orders` SET `customerID` = '2' WHERE `orders`.`orderID` = 1;
+
+UPDATE `tshirts` SET `size` = 'medium' WHERE `tshirts`.`tshirtID` = 2;
+
+DELETE FROM `orders` WHERE `orders`.`orderID` = 1;
+
+
+DELETE FROM `customers` WHERE `customers`.`customerID`=1;
+
+
+
