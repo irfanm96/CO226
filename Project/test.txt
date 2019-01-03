@@ -1,0 +1,33 @@
+
+CREATE DATABASE project;
+
+CREATE TABLE `users`(`id` INT NOT NULL AUTO_INCREMENT,`firstName` TEXT NOT NULL , `lastName` TEXT NOT NULL, `email` TEXT NOT NULL, `password` VARCHAR(255) NOT NULL, `role` INT(1) NOT NULL, `lastAccess` DATETIME NOT NULL, PRIMARY KEY (`id`) );
+
+
+CREATE TABLE `userStudent` (`eNum` VARCHAR(6) NOT NULL ,
+                            `id` INT(6) NOT NULL,
+                            `dept` ENUM("com","civil","prod","chem","mech","elec") NOT NULL,
+                            PRIMARY KEY (`eNum`),
+                            FOREIGN KEY (`id`) REFERENCES  users(`id`) ON UPDATE CASCADE ON DELETE CASCADE
+                           );
+
+
+
+CREATE TABLE `courses`(`courseID` INT NOT NULL AUTO_INCREMENT, `courseTitle` TEXT NOT NULL, `year` YEAR NOT NULL, `semester` INT(1) NOT NULL, `lecID` INT(6) NOT NULL, `instID` INT(6), `contactHours` INT(2) NOT NULL, `labHours` INT(2), PRIMARY KEY (`courseID`), FOREIGN KEY (`lecID`) REFERENCES users(`id`), FOREIGN KEY (`instID`) REFERENCES users(`id`) );
+
+
+CREATE TABLE `classList`(`courseID` INT(6) NOT NULL, `studID` VARCHAR(8) NOT NULL, `grade` VARCHAR(2), `attendance` DOUBLE, `midResult` VARCHAR(2), `endResult` VARCHAR(2), PRIMARY KEY (courseID,studID), FOREIGN KEY (`courseID`) REFERENCES courses(`courseID`), FOREIGN KEY (`studID`) REFERENCES userStudent(`eNum`) );
+
+CREATE TABLE `data`(`id` INT(4) NOT NULL,
+                   `dKey` TEXT,
+                    `dValue` TEXT,
+                    PRIMARY KEY (`id`)
+                   );
+
+
+CREATE TABLE `class`(`id` INT(6) NOT NULL, `courseID` INT(6) NOT NULL, `classType` ENUM("lab","lecture","tutorial"), `classDate` DATE NOT NULL, `classTime` TIME NOT NULL, `duration` INT(3) NOT NULL, `conductedBy` INT(6) NOT NULL, PRIMARY KEY (`id`), FOREIGN KEY (`courseID`) REFERENCES courses(`courseID`), FOREIGN KEY (`conductedBy`) REFERENCES users(`id`) );
+
+
+CREATE TABLE `attendance`(`classID` INT(6) NOT NULL, `studID` VARCHAR(8) NOT NULL, `attendance` INT(1) NOT NULL, PRIMARY KEY (`classID`,`studID`), FOREIGN KEY (`classID`) REFERENCES class(`id`), FOREIGN KEY (`studID`) REFERENCES userStudent(`eNum`) );
+
+
