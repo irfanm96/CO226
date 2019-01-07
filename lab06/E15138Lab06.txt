@@ -1,0 +1,295 @@
+1.
+CREATE TABLE `Student`(
+`RegistrationNumber` INT(3) NOT NULL, 
+`Name` VARCHAR(31) NOT NULL,
+ `GPA` FLOAT(3,2),
+ `CRegistrationNumber` INT(6),
+ `Class` VARCHAR(63),
+  PRIMARY KEY (`RegistrationNumber`)    
+);
+
+
+//inserting data
+
+INSERT INTO Student(Name, RegistrationNumber, GPA) VALUES
+ ("Sameera", 425, 3.25 ),
+ ("Kasun", 210, 3.40 ),
+ ("Kalpa", 201, 3.10 ),
+ ("Chathura", 312, 3.85 ),
+ ("Lakmali", 473, 3.75 ),
+ ("Sidath", 352, 3.30 ),
+ ("Kumudu", 111, 3.70 ),
+ ("Nalin", 456, 3.05 ),
+ ("Roshani", 324, 3.70 ),
+ ("Chithara", 231, 3.30 );
+
+//check the entries
+
+SELECT * FROM Student;
++--------------------+----------+------+---------------------+-------+
+| RegistrationNumber | Name     | GPA  | CRegistrationNumber | Class |
++--------------------+----------+------+---------------------+-------+
+|                111 | Kumudu   | 3.70 |                NULL | NULL  |
+|                201 | Kalpa    | 3.10 |                NULL | NULL  |
+|                210 | Kasun    | 3.40 |                NULL | NULL  |
+|                231 | Chithara | 3.30 |                NULL | NULL  |
+|                312 | Chathura | 3.85 |                NULL | NULL  |
+|                324 | Roshani  | 3.70 |                NULL | NULL  |
+|                352 | Sidath   | 3.30 |                NULL | NULL  |
+|                425 | Sameera  | 3.25 |                NULL | NULL  |
+|                456 | Nalin    | 3.05 |                NULL | NULL  |
+|                473 | Lakmali  | 3.75 |                NULL | NULL  |
++--------------------+----------+------+---------------------+-------+
+10 rows in set (0.00 sec)
+
+	
+2.
+
+CREATE TABLE `Convocation`(
+ `CRegistrationNumber` INT(6) NOT NULL,
+`LastName` VARCHAR(63),
+ `Address` VARCHAR(63),
+ `Age` INT(3),
+ `RegistrationNumber` INT(3) NOT NULL,
+ PRIMARY KEY (`CRegistrationNumber`),
+ FOREIGN KEY (`RegistrationNumber`) REFERENCES Student (`RegistrationNumber`) );
+
+
+//check the attributes and constrains
+
+DESCRIBE Convocation;
++---------------------+-------------+------+-----+---------+-------+
+| Field               | Type        | Null | Key | Default | Extra |
++---------------------+-------------+------+-----+---------+-------+
+| CRegistrationNumber | int(6)      | NO   | PRI | NULL    |       |
+| LastName            | varchar(63) | YES  |     | NULL    |       |
+| Address             | varchar(63) | YES  |     | NULL    |       |
+| Age                 | int(3)      | YES  |     | NULL    |       |
+| RegistrationNumber  | int(3)      | NO   | MUL | NULL    |       |
++---------------------+-------------+------+-----+---------+-------+
+5 rows in set (0.01 sec)
+
+
+
+3.// create addConvocationDetails() Procedure
+
+
+DELIMITER //
+CREATE PROCEDURE addConvocationDetails( IN LastName VARCHAR(63), IN Address VARCHAR(63), IN Age INT(3), IN PRegistrationNumber INT(3), IN PCRegistrationNumber INT(6))
+ BEGIN
+ INSERT INTO Convocation( CRegistrationNumber  ,LastName, Address, Age, RegistrationNumber) VALUES( PCRegistrationNumber,LastName, Address, Age, PRegistrationNumber);
+ Update Student
+ SET CRegistrationNumber = ( SELECT CRegistrationNumber FROM Convocation WHERE CRegistrationNumber =PCRegistrationNumber) WHERE RegistrationNumber = PRegistrationNumber;
+ END //
+DELIMITER ;
+
+
+4.//use addConvocationDetails() procedure to update the table
+
+
+CALL addConvocationDetails( 'Sameera', '99/b Dehiyanga', 21, 425, 1 );
+CALL addConvocationDetails( 'Chathura', '104 E Kandy', 23, 312, 2 );
+CALL addConvocationDetails( 'Lakmali', '152/F/1 Kegalle', 25, 473, 3 );
+CALL addConvocationDetails( 'Sidath', '123 D Colombo', 21, 352, 4 );
+CALL addConvocationDetails( 'Nalin', '12/1/A Matale', 23, 456, 5 );
+
+//check the student table
+
+ SELECT * FROM Student;
+
++--------------------+----------+------+---------------------+-------+
+| RegistrationNumber | Name     | GPA  | CRegistrationNumber | Class |
++--------------------+----------+------+---------------------+-------+
+|                111 | Kumudu   | 3.70 |                NULL | NULL  |
+|                201 | Kalpa    | 3.10 |                NULL | NULL  |
+|                210 | Kasun    | 3.40 |                NULL | NULL  |
+|                231 | Chithara | 3.30 |                NULL | NULL  |
+|                312 | Chathura | 3.85 |                   2 | NULL  |
+|                324 | Roshani  | 3.70 |                NULL | NULL  |
+|                352 | Sidath   | 3.30 |                   4 | NULL  |
+|                425 | Sameera  | 3.25 |                   1 | NULL  |
+|                456 | Nalin    | 3.05 |                   5 | NULL  |
+|                473 | Lakmali  | 3.75 |                   3 | NULL  |
++--------------------+----------+------+---------------------+-------+
+10 rows in set (0.00 sec)
+
+
+
+//check the convocation table
+SELECT * FROM Convocation;
++---------------------+----------+-----------------+------+--------------------+
+| CRegistrationNumber | LastName | Address         | Age  | RegistrationNumber |
++---------------------+----------+-----------------+------+--------------------+
+|                   1 | Sameera  | 99/b Dehiyanga  |   21 |                425 |
+|                   2 | Chathura | 104 E Kandy     |   23 |                312 |
+|                   3 | Lakmali  | 152/F/1 Kegalle |   25 |                473 |
+|                   4 | Sidath   | 123 D Colombo   |   21 |                352 |
+|                   5 | Nalin    | 12/1/A Matale   |   23 |                456 |
++---------------------+----------+-----------------+------+--------------------+
+5 rows in set (0.00 sec)
+
+
+
+5.// create registerted view
+
+
+CREATE VIEW Registered AS SELECT Name, S.RegistrationNumber, GPA, S.CRegistrationNumber, C.Address, C.Age FROM Student S, Convocation C WHERE S.RegistrationNumber = C.RegistrationNumber;
+
+
+//Observe the view
+
+SELECT* FROM Registered;
+
++----------+--------------------+------+---------------------+-----------------+------+
+| Name     | RegistrationNumber | GPA  | CRegistrationNumber | Address         | Age  |
++----------+--------------------+------+---------------------+-----------------+------+
+| Sameera  |                425 | 3.25 |                   1 | 99/b Dehiyanga  |   21 |
+| Chathura |                312 | 3.85 |                   2 | 104 E Kandy     |   23 |
+| Lakmali  |                473 | 3.75 |                   3 | 152/F/1 Kegalle |   25 |
+| Sidath   |                352 | 3.30 |                   4 | 123 D Colombo   |   21 |
+| Nalin    |                456 | 3.05 |                   5 | 12/1/A Matale   |   23 |
++----------+--------------------+------+---------------------+-----------------+------+
+5 rows in set (0.00 sec)
+
+
+
+6.// create Notregisterted view
+// note that the address and the age colomn are going to be null for those who have not registered for the convacation;
+
+CREATE VIEW NotRegistered AS SELECT Name, RegistrationNumber, GPA, NULL AS Address, NULL AS Age FROM Student WHERE CRegistrationNumber IS NULL
+SELECT * FROM NotRegistered;
+
++----------+--------------------+------+---------+------+
+| Name     | RegistrationNumber | GPA  | Address | Age  |
++----------+--------------------+------+---------+------+
+| Kumudu   |                111 | 3.70 |    NULL | NULL |
+| Kalpa    |                201 | 3.10 |    NULL | NULL |
+| Kasun    |                210 | 3.40 |    NULL | NULL |
+| Chithara |                231 | 3.30 |    NULL | NULL |
+| Roshani  |                324 | 3.70 |    NULL | NULL |
++----------+--------------------+------+---------+------+
+5 rows in set (0.00 sec)
+
+7.
+
+CREATE TABLE `LateRegistration`(
+ `CRegistrationNumber` INT(6) NOT NULL,
+`LastName` VARCHAR(63),
+ `Address` VARCHAR(63),
+ `Age` INT(3),
+ `RegistrationNumber` INT(3) NOT NULL,
+ PRIMARY KEY (`CRegistrationNumber`),
+ FOREIGN KEY (`RegistrationNumber`) REFERENCES Student (`RegistrationNumber`) );
+
+//check the attributes
+
+DESCRIBE LateRegistration;
++---------------------+-------------+------+-----+---------+-------+
+| Field               | Type        | Null | Key | Default | Extra |
++---------------------+-------------+------+-----+---------+-------+
+| CRegistrationNumber | int(6)      | NO   | PRI | NULL    |       |
+| LastName            | varchar(63) | YES  |     | NULL    |       |
+| Address             | varchar(63) | YES  |     | NULL    |       |
+| Age                 | int(3)      | YES  |     | NULL    |       |
+| RegistrationNumber  | int(3)      | NO   | MUL | NULL    |       |
++---------------------+-------------+------+-----+---------+-------+
+5 rows in set (0.00 sec)
+
+
+8.
+
+
+DELIMITER //
+CREATE TRIGGER LateRegistrationTrigger
+ AFTER INSERT ON LateRegistration
+ FOR EACH ROW
+ BEGIN
+ IF NEW.CRegistrationNumber IS NOT NULL THEN
+ UPDATE Student
+ SET CRegistrationNumber = NEW.CRegistrationNumber
+ WHERE RegistrationNumber = NEW.RegistrationNumber;
+ END IF;
+ END //
+ DELIMITER ;
+
+
+9.
+
+INSERT INTO LateRegistration(CregistrationNumber,LastName,Address,Age ,RegistrationNumber) VALUES
+ (6, 'Kasun', '78/A/1 Kandy', 21, 210 ),
+ (7, 'Kalpa', '12/B Colombo', 22, 201 ),
+ (8, 'Kumudu', '102 A Galle', 25, 111 ),
+ (9, 'Rohani', '15/E Gampola', 21, 324 ),
+ (10, 'Chitra', '100 E Peradeniya', 23, 231 );
+
+//check lateRegistration table 
+SELECT * FROM LateRegistration;
++---------------------+----------+------------------+------+--------------------+
+| CRegistrationNumber | LastName | Address          | Age  | RegistrationNumber |
++---------------------+----------+------------------+------+--------------------+
+|                   6 | Kasun    | 78/A/1 Kandy     |   21 |                210 |
+|                   7 | Kalpa    | 12/B Colombo     |   22 |                201 |
+|                   8 | Kumudu   | 102 A Galle      |   25 |                111 |
+|                   9 | Rohani   | 15/E Gampola     |   21 |                324 |
+|                  10 | Chitra   | 100 E Peradeniya |   23 |                231 |
++---------------------+----------+------------------+------+--------------------+
+5 rows in set (0.00 sec)
+
+
+
+//check students table
+SELECT * FROM Student;
+
++--------------------+----------+------+---------------------+-------+
+| RegistrationNumber | Name     | GPA  | CRegistrationNumber | Class |
++--------------------+----------+------+---------------------+-------+
+|                111 | Kumudu   | 3.70 |                   8 | NULL  |
+|                201 | Kalpa    | 3.10 |                   7 | NULL  |
+|                210 | Kasun    | 3.40 |                   6 | NULL  |
+|                231 | Chithara | 3.30 |                  10 | NULL  |
+|                312 | Chathura | 3.85 |                   2 | NULL  |
+|                324 | Roshani  | 3.70 |                   9 | NULL  |
+|                352 | Sidath   | 3.30 |                   4 | NULL  |
+|                425 | Sameera  | 3.25 |                   1 | NULL  |
+|                456 | Nalin    | 3.05 |                   5 | NULL  |
+|                473 | Lakmali  | 3.75 |                   3 | NULL  |
++--------------------+----------+------+---------------------+-------+
+10 rows in set (0.00 sec)
+
+10.
+
+
+DELIMITER //
+ CREATE PROCEDURE classUpdateOnStudent()
+ BEGIN
+ UPDATE Student SET Class = 'First Class Honors' WHERE GPA >= 3.70;
+ UPDATE Student SET Class = 'Second Class Honors-Upper Division' WHERE (GPA < 3.70) AND (GPA >= 3.30);
+ UPDATE Student SET Class = 'Second Class Honors-Lower Division' WHERE (GPA < 3.30) AND (GPA >= 2.70);
+ UPDATE Student SET Class = 'Third Class Honors' WHERE (GPA < 2.70) AND (GPA >= 2.0);
+ END; //
+ DELIMITER ;
+
+
+//check the procedure
+
+CALL classUpdateOnStudent();
+
+
+//check the student table
+SELECT * FROM Student;
++--------------------+----------+------+---------------------+------------------------------------+
+| RegistrationNumber | Name     | GPA  | CRegistrationNumber | Class                              |
++--------------------+----------+------+---------------------+------------------------------------+
+|                111 | Kumudu   | 3.70 |                   8 | First Class Honors                 |
+|                201 | Kalpa    | 3.10 |                   7 | Second Class Honors-Lower Division |
+|                210 | Kasun    | 3.40 |                   6 | Second Class Honors-Upper Division |
+|                231 | Chithara | 3.30 |                  10 | Second Class Honors-Upper Division |
+|                312 | Chathura | 3.85 |                   2 | First Class Honors                 |
+|                324 | Roshani  | 3.70 |                   9 | First Class Honors                 |
+|                352 | Sidath   | 3.30 |                   4 | Second Class Honors-Upper Division |
+|                425 | Sameera  | 3.25 |                   1 | Second Class Honors-Lower Division |
+|                456 | Nalin    | 3.05 |                   5 | Second Class Honors-Lower Division |
+|                473 | Lakmali  | 3.75 |                   3 | First Class Honors                 |
++--------------------+----------+------+---------------------+------------------------------------+
+10 rows in set (0.00 sec)
+

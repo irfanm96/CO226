@@ -1,0 +1,452 @@
+
+1.(a) SELECT * FROM movie m  
+WHERE Director IN (SELECT ReviewerName FROM reviewer);
+ 
++---------+---------+------+---------------+------------+---------------+
+| MovieID | Title   | Year | Director      | ReviewerID | ReviewerName  |
++---------+---------+------+---------------+------------+---------------+
+|     105 | Titanic | 1997 | James Cameron |        207 | James Cameron |
+|     107 | Avatar  | 2009 | James Cameron |        207 | James Cameron |
++---------+---------+------+---------------+------------+---------------+
+
+1.(b) SELECT * FROM movie m  
+WHERE Director NOT IN (SELECT ReviewerName FROM reviewer);
+ 
++---------+-------------------------+------+------------------+
+| MovieID | Title                   | Year | Director         |
++---------+-------------------------+------+------------------+
+|     101 | Gone with the Wind      | 1939 | Victor Fleming   |
+|     102 | Star Wars               | 1977 | George Lucas     |
+|     104 | E.T                     | 1982 | Steven Spielberg |
+|     108 | Raiders of the Lost Ark | 1981 | Steven Spielberg |
++---------+-------------------------+------+------------------+
+
+2.(a) SELECT * FROM rating WHERE ReviewerID IN
+(SELECT ReviewerID FROM reviewer WHERE ReviewerName='Sarah Martinez');
++----------+------------+---------+-------+------------+
+| RatingID | ReviewerID | MovieID | Stars | RatingDate |
++----------+------------+---------+-------+------------+
+|        1 |        201 |     101 |     2 | 2011-01-22 |
+|        2 |        201 |     101 |     4 | 2011-01-27 |
++----------+------------+---------+-------+------------+
+
+2.(b) 
+SELECT * FROM rating WHERE ReviewerID NOT IN
+(SELECT ReviewerID FROM reviewer WHERE ReviewerName='Sarah Martinez');
+
++----------+------------+---------+-------+------------+
+| RatingID | ReviewerID | MovieID | Stars | RatingDate |
++----------+------------+---------+-------+------------+
+|        3 |        202 |     106 |     4 | NULL       |
+|        4 |        203 |     103 |     2 | 2011-01-20 |
+|        5 |        203 |     108 |     4 | 2011-01-12 |
+|        6 |        203 |     108 |     2 | 2011-01-30 |
+|        7 |        204 |     101 |     3 | 2011-01-09 |
+|        8 |        205 |     103 |     3 | 2011-01-27 |
+|        9 |        205 |     104 |     2 | 2011-01-22 |
+|       10 |        205 |     108 |     4 | NULL       |
+|       11 |        206 |     107 |     3 | 2011-01-15 |
+|       12 |        206 |     106 |     5 | 2011-01-19 |
+|       13 |        207 |     107 |     5 | 2011-01-20 |
+|       14 |        208 |     104 |     3 | 2011-01-02 |
++----------+------------+---------+-------+------------+
+
+
+3.
+(a)
+ 
+SELECT MovieId FROM rating WHERE stars< ANY(SELECT stars FROM rating WHERE MovieID=103);
+
++---------+
+| MovieId |
++---------+
+|     101 |
+|     103 |
+|     108 |
+|     104 |
++---------+
+
+
+3.(b) SELECT MovieId FROM rating WHERE stars<= ANY(SELECT stars FROM rating WHERE MovieID=103);
++---------+
+| MovieId |
++---------+
+|     101 |
+|     103 |
+|     108 |
+|     101 |
+|     103 |
+|     104 |
+|     107 |
+|     104 |
++---------+
+
+
+
+3.(c)  SELECT MovieId FROM rating WHERE stars IN (SELECT stars FROM rating WHERE MovieID=103);
+
++---------+
+| MovieId |
++---------+
+|     101 |
+|     103 |
+|     108 |
+|     101 |
+|     103 |
+|     104 |
+|     107 |
+|     104 |
++---------+
+
+
+3.(d) 
+SELECT MovieId FROM rating WHERE stars > ANY (SELECT stars FROM rating WHERE MovieID=103);
++---------+
+| MovieId |
++---------+
+|     101 |
+|     106 |
+|     108 |
+|     101 |
+|     103 |
+|     108 |
+|     107 |
+|     106 |
+|     107 |
+|     104 |
++---------+
+
+
+3.(e) SELECT MovieId FROM rating WHERE stars >= ANY(SELECT stars FROM rating WHERE MovieID=103);
+
++---------+
+| MovieId |
++---------+
+|     101 |
+|     101 |
+|     106 |
+|     103 |
+|     108 |
+|     108 |
+|     101 |
+|     103 |
+|     104 |
+|     108 |
+|     107 |
+|     106 |
+|     107 |
+|     104 |
++---------+
+
+
+3.(f) SELECT MovieId FROM rating WHERE stars NOT IN (SELECT stars FROM rating WHERE MovieID=103);
++---------+
+| MovieId |
++---------+
+|     101 |
+|     106 |
+|     108 |
+|     108 |
+|     106 |
+|     107 |
++---------+
+
+
+4.
+ 
+SELECT ReviewerID FROM rating WHERE MovieID IN
+(SELECT MovieID FROM rating WHERE RatingDate='2011-01-12')
+ AND stars IN
+(SELECT stars FROM rating WHERE RatingDate='2011-01-12') ;
+
+
++------------+
+| ReviewerID |
++------------+
+|        203 |
+|        205 |
++------------+
+
+
+5.
+(a)
+
+SELECT DISTINCT year FROM movie m ,rating r WHERE m.MovieID=r.MovieID AND (r.stars=4 OR r.stars=5) ORDER BY year ;
++------+
+| year |
++------+
+| 1937 |
+| 1939 |
+| 1981 |
+| 2009 |
++------+
+
+
+5. (b)
+SELECT year FROM movie WHERE MovieID IN (SELECT MovieID FROM rating WHERE (stars=4 OR stars=5)) ORDER BY year;
++------+
+| year |
++------+
+| 1937 |
+| 1939 |
+| 1981 |
+| 2009 |
++------+
+
+6 .(a) SELECT title FROM movie m WHERE MovieID NOT IN (SELECT MovieID FROM rating);
+
++-----------+
+| title     |
++-----------+
+| Star Wars |
+| Titanic   |
++-----------+
+
+6 .(b) 
+SELECT title FROM movie m WHERE MovieID NOT IN (SELECT MovieID FROM rating r WHERE m.MovieID=r.MovieID);
+
++-----------+
+| title     |
++-----------+
+| Star Wars |
+| Titanic   |
++-----------+
+
+7.(a) 
+SELECT ReviewerName FROM reviewer r, rating a WHERE r.ReviewerID=a.ReviewerID AND a.RatingDate IS NULL;
+
++---------------+
+| ReviewerName  |
++---------------+
+| Daniel Lewis  |
+| Chris Jackson |
++---------------+
+
+7.(b)
+
+SELECT ReviewerName FROM reviewer WHERE ReviewerID IN (SELECT ReviewerID FROM rating WHERE RatingDate IS NULL);
++---------------+
+| ReviewerName  |
++---------------+
+| Daniel Lewis  |
+| Chris Jackson |
++---------------+
+
+7.(c)
+
+SELECT ReviewerName FROM reviewer r WHERE ReviewerID IN (SELECT ReviewerID FROM rating a WHERE r.ReviewerID=a.ReviewerID AND  RatingDate IS NULL);
+
++---------------+
+| ReviewerName  |
++---------------+
+| Daniel Lewis  |
+| Chris Jackson |
++---------------+
+
+8.(a)
+SELECT m.title,MAX(r.stars) FROM rating r, movie m WHERE m.MovieID=r.MovieID GROUP BY m.title ORDER BY m.title;
++-------------------------+--------------+
+| title                   | MAX(r.stars) |
++-------------------------+--------------+
+| Avatar                  |            5 |
+| E.T                     |            3 |
+| Gone with the Wind      |            4 |
+| Raiders of the Lost Ark |            4 |
+| Snow White              |            5 |
+| The Sound of Music      |            3 |
++-------------------------+--------------+
+
+8.(b)
+SELECT m.title,MIN(r.stars) FROM rating r, movie m WHERE m.MovieID=r.MovieID GROUP BY m.title ORDER BY m.title;
++-------------------------+--------------+
+| title                   | MIN(r.stars) |
++-------------------------+--------------+
+| Avatar                  |            3 |
+| E.T                     |            2 |
+| Gone with the Wind      |            2 |
+| Raiders of the Lost Ark |            2 |
+| Snow White              |            4 |
+| The Sound of Music      |            2 |
++-------------------------+--------------+
+
+
+8.(c)
+SELECT m.title,AVG(r.stars) FROM rating r, movie m WHERE m.MovieID=r.MovieID GROUP BY m.title ORDER BY m.title;
++-------------------------+--------------+
+| title                   | AVG(r.stars) |
++-------------------------+--------------+
+| Avatar                  |       4.0000 |
+| E.T                     |       2.5000 |
+| Gone with the Wind      |       3.0000 |
+| Raiders of the Lost Ark |       3.3333 |
+| Snow White              |       4.5000 |
+| The Sound of Music      |       2.5000 |
++-------------------------+--------------+
+
+
+8.(d)
+SELECT m.title,SUM(r.stars) FROM rating r, movie m WHERE m.MovieID=r.MovieID GROUP BY m.title ORDER BY m.title;
++-------------------------+--------------+
+| title                   | SUM(r.stars) |
++-------------------------+--------------+
+| Avatar                  |            8 |
+| E.T                     |            5 |
+| Gone with the Wind      |            9 |
+| Raiders of the Lost Ark |           10 |
+| Snow White              |            9 |
+| The Sound of Music      |            5 |
++-------------------------+--------------+
+
+
+8.(e)
+SELECT m.title,COUNT(r.MovieID) FROM rating r, movie m WHERE m.MovieID=r.MovieID GROUP BY m.title ORDER BY m.title;
++-------------------------+------------------+
+| title                   | COUNT(r.MovieID) |
++-------------------------+------------------+
+| Avatar                  |                2 |
+| E.T                     |                2 |
+| Gone with the Wind      |                3 |
+| Raiders of the Lost Ark |                3 |
+| Snow White              |                2 |
+| The Sound of Music      |                2 |
++-------------------------+------------------+
+
+9.(a)
+
+SELECT r.ReviewerName FROM reviewer r, rating a WHERE r.ReviewerID=a.ReviewerID GROUP BY r.ReviewerID HAVING COUNT(r.ReviewerID)>=3;
+
++-----------------+
+| ReviewerName    |
++-----------------+
+| Brittany Harris |
+| Chris Jackson   |
++-----------------+
+
+9.(b)
+
+SELECT ReviewerName FROM reviewer WHERE ReviewerID IN (SELECT ReviewerID FROM rating GROUP BY ReviewerID HAVING COUNT(ReviewerID) >=3 ) ;
+
++-----------------+
+| ReviewerName    |
++-----------------+
+| Brittany Harris |
+| Chris Jackson   |
++-----------------+
+
+9.(c)
+SELECT ReviewerName FROM reviewer r WHERE ReviewerID IN (SELECT ReviewerID FROM rating WHERE ReviewerID = r.ReviewerId GROUP BY ReviewerID HAVING COUNT(ReviewerID) >=3);
+
++-----------------+
+| ReviewerName    |
++-----------------+
+| Brittany Harris |
+| Chris Jackson   |
++-----------------+
+
+10 .
+SELECT r.MovieID,m.title,r.ReviewerID,r.stars  FROM rating r,movie m WHERE m.MovieID=r.MovieID;
++---------+-------------------------+------------+-------+
+| MovieID | title                   | ReviewerID | stars |
++---------+-------------------------+------------+-------+
+|     101 | Gone with the Wind      |        201 |     2 |
+|     101 | Gone with the Wind      |        201 |     4 |
+|     106 | Snow White              |        202 |     4 |
+|     103 | The Sound of Music      |        203 |     2 |
+|     108 | Raiders of the Lost Ark |        203 |     4 |
+|     108 | Raiders of the Lost Ark |        203 |     2 |
+|     101 | Gone with the Wind      |        204 |     3 |
+|     103 | The Sound of Music      |        205 |     3 |
+|     104 | E.T                     |        205 |     2 |
+|     108 | Raiders of the Lost Ark |        205 |     4 |
+|     107 | Avatar                  |        206 |     3 |
+|     106 | Snow White              |        206 |     5 |
+|     107 | Avatar                  |        207 |     5 |
+|     104 | E.T                     |        208 |     3 |
++---------+-------------------------+------------+-------+
+
+11.
+SELECT m.title,AVG(r.stars) FROM rating r,movie m WHERE m.MovieID=r.MovieID GROUP BY r.MovieID ORDER BY m.title;
+
++-------------------------+--------------+
+| title                   | AVG(r.stars) |
++-------------------------+--------------+
+| Avatar                  |       4.0000 |
+| E.T                     |       2.5000 |
+| Gone with the Wind      |       3.0000 |
+| Raiders of the Lost Ark |       3.3333 |
+| Snow White              |       4.5000 |
+| The Sound of Music      |       2.5000 |
++-------------------------+--------------+
+
+12.  DELETE FROM rating WHERE MovieID IN ( SELECT MovieID FROM movie WHERE (Year <1970 OR Year > 2000));
+ 
+
+check 
+SELECT year FROM movie WHERE MovieID IN (SELECT MovieID FROM rating) ;
++------+
+| year |
++------+
+| 1982 |
+| 1981 |
++------+
+
+13. DELETE  FROM rating WHERE RatingDate IS NULL;
+
+Check
+
+SELECT * FROM rating;
+
++----------+------------+---------+-------+------------+
+| RatingID | ReviewerID | MovieID | Stars | RatingDate |
++----------+------------+---------+-------+------------+
+|        5 |        203 |     108 |     4 | 2011-01-12 |
+|        6 |        203 |     108 |     2 | 2011-01-30 |
+|        9 |        205 |     104 |     2 | 2011-01-22 |
+|       14 |        208 |     104 |     3 | 2011-01-02 |
++----------+------------+---------+-------+------------+
+
+
+14.
+
+INSERT INTO rating (ReviewerID,MovieID) SELECT r.ReviewerID, m.MovieID FROM reviewer r, movie m WHERE r.ReviewerName = 'James Cameron';
+
+ UPDATE rating r SET stars = 5 WHERE r.ReviewerID IN (SELECT a.ReviewerID FROM reviewer a WHERE a.ReviewerName = 'James Cameron' );
+
+Check
+SELECT * FROM rating;
+
++----------+------------+---------+-------+------------+
+| RatingID | ReviewerID | MovieID | Stars | RatingDate |
++----------+------------+---------+-------+------------+
+|        5 |        203 |     108 |     4 | 2011-01-12 |
+|        6 |        203 |     108 |     2 | 2011-01-30 |
+|        9 |        205 |     104 |     2 | 2011-01-22 |
+|       14 |        208 |     104 |     3 | 2011-01-02 |
+|       15 |        207 |     101 |     5 | NULL       |
+|       16 |        207 |     102 |     5 | NULL       |
+|       17 |        207 |     103 |     5 | NULL       |
+|       18 |        207 |     104 |     5 | NULL       |
+|       19 |        207 |     105 |     5 | NULL       |
+|       20 |        207 |     106 |     5 | NULL       |
+|       21 |        207 |     107 |     5 | NULL       |
+|       22 |        207 |     108 |     5 | NULL       |
++----------+------------+---------+-------+------------+
+
+15.
+ UPDATE movie m SET m.year = m.year + 25 WHERE m.MovieID IN ( SELECT r.MovieID FROM rating r GROUP BY r.MovieID HAVING AVG(stars) >= 4 );
+
+ SELECT m.Title, m.Year, AVG(stars) FROM movie m, rating r WHERE r.MovieID = m.MovieID GROUP BY m.MovieID;
+
++-------------------------+------+------------+
+| Title                   | Year | AVG(stars) |
++-------------------------+------+------------+
+| Gone with the Wind      | 1964 |     5.0000 |
+| Star Wars               | 2002 |     5.0000 |
+| The Sound of Music      | 1990 |     5.0000 |
+| E.T                     | 1982 |     3.3333 |
+| Titanic                 | 2022 |     5.0000 |
+| Snow White              | 1962 |     5.0000 |
+| Avatar                  | 2034 |     5.0000 |
+| Raiders of the Lost Ark | 1981 |     3.6667 |
++-------------------------+------+------------+
+
